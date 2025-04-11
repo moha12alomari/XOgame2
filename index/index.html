@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>XO Game</title>
+  <style>
+    body {
+      background-image: url('https://cdn.shopify.com/s/files/1/1434/2870/products/xo-neon-sign-green_1800x1800.jpg?v=1605788043');
+      background-size: 100% 100vh;
+      background-repeat: no-repeat;
+      background-position: center top;
+      background-attachment: fixed;
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    table {
+      margin: auto;
+      text-align: center;
+      font-size: 30px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-collapse: collapse;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+    }
+    td {
+      width: 80px;
+      height: 80px;
+      border: 1px solid rgba(102, 255, 102, 0.7);
+      background: rgba(102, 255, 102, 0.2);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s, box-shadow 0.3s;
+      font-size: 40px;
+      text-align: center;
+      vertical-align: middle;
+    }
+    td:hover {
+      background: rgba(102, 255, 102, 0.4);
+      box-shadow: 0 0 15px rgba(102, 255, 102, 1);
+    }
+    td.x {
+      color: black;
+      background: rgba(0, 0, 255, 0.1);
+    }
+    td.o {
+      color: white;
+      background: rgba(0, 0, 255, 0.1);
+    }
+    h1, p {
+      text-align: center;
+      color: black;
+      text-shadow:
+        0 0 5px white,
+        0 0 10px white,
+        0 0 15px white,
+        0 0 20px white,
+        0 0 25px white,
+        0 0 30px white,
+        0 0 35px white;
+    }
+    #loginForm {
+      text-align: center;
+      margin-bottom: 20px;
+      background-color: rgba(0, 255, 0, 0.4);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+    }
+    #loginForm input, #loginForm select {
+      margin: 10px;
+      padding: 10px;
+      font-size: 18px;
+      width: 200px;
+      border-radius: 5px;
+      border: 1px solid rgba(0, 255, 0, 0.7);
+    }
+    #loginForm button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: rgba(0, 255, 0, 0.7);
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+    #loginForm button:hover {
+      background-color: rgba(0, 255, 0, 1);
+    }
+    #winMessage, #drawMessage {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #4CAF50;
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      font-size: 24px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      text-align: center;
+      z-index: 1000;
+    }
+    #restartButton, #exitMessage button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: #f44336;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+    #restartButton:hover, #exitMessage button:hover {
+      background-color: #d32f2f;
+    }
+    #exitMessage {
+      display: none;
+      text-align: center;
+      font-size: 20px;
+    }
+    #feedbackSection {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 20px;
+      color: #333;
+    }
+    #feedbackSection input {
+      padding: 10px;
+      width: 300px;
+      font-size: 16px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    #sendButton {
+      display: none;
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: #2196F3;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+    #sendButton:hover {
+      background-color: #1976D2;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loginForm">
+    <h1>مرحبا بك في لعبة XO!</h1>
+    <p>اللعب ضد الذكاء الاصطناعي</p>
+
+    <p>يرجى إدخال اسمك وعمرك للبدء:</p>
+    <input type="text" id="playerName1" placeholder="أدخل اسمك" required><br>
+    <input type="number" id="playerAge1" placeholder="أدخل عمرك" required><br>
+    <label for="playerChoice1">اختر حرفك (X أو O):</label>
+    <select id="playerChoice1">
+      <option value="X">X</option>
+      <option value="O">O</option>
+    </select><br>
+    <button onclick="startGame()">ابدأ اللعبة</button>
+  </div>
+
+  <div id="gameArea" style="display:none;">
+    <table id="xo-board">
+      <tr><td onclick="makeMove(this)"></td><td onclick="makeMove(this)"></td><td onclick="makeMove(this)"></td></tr>
+      <tr><td onclick="makeMove(this)"></td><td onclick="makeMove(this)"></td><td onclick="makeMove(this)"></td></tr>
+      <tr><td onclick="makeMove(this)"></td><td onclick="makeMove(this)"></td><td onclick="makeMove(this)"></td></tr>
+    </table>
+    <p id="status" style="font-size: 20px;">الدور: X</p>
+  </div>
+
+  <div id="winMessage">
+    <p>مبروك لقد فزت, <span id="winnerName"></span>!</p>
+    <p>نصيحة: تأكد من تحديث اللعبة بشكل دوري لمواكبة التحديثات الجديدة!</p>
+    <label for="feedbackInput">اكتب تعليقك أو اقتراحك هنا:</label><br>
+    <p><strong>إرسال تعليقك:</strong></p>
+    <input type="text" id="feedbackInput" placeholder="اكتب هنا..." oninput="toggleSendButton()"><br>
+    <button id="sendButton" onclick="sendFeedback()">إرسال</button>
+    <button id="restartButton" onclick="restartGame()">إعادة اللعبة</button>
+    <button id="exitButton" onclick="exitGame()">الخروج</button>
+  </div>
+
+  <div id="winMessage">
+    <p>مبروك لقد فزت, <span id="winnerName"></span>!</p>
+    <p>نصيحة: تأكد من تحديث اللعبة بشكل دوري لمواكبة التحديثات الجديدة!</p>
+    <p><strong>إرسال تعليقك:</strong></p>
+    <label for="feedbackInput">اكتب تعليقك أو اقتراحك هنا:</label><br>
+    <p><strong>إرسال تعليقك:</strong></p>
+    <input type="text" id="feedbackInput" placeholder="اكتب هنا..." oninput="toggleSendButton()"><br>
+    <button id="sendButton" onclick="sendFeedback()">إرسال</button>
+    <button id="restartButton" onclick="restartGame()">إعادة اللعبة</button>
+    <button id="exitButton" onclick="exitGame()">الخروج</button>
+  </div>
+  
+  <div id="exitMessage">
+    <p>هل تريد إعادة اللعب أو الخروج؟</p>
+    <button onclick="restartGame()">إعادة اللعب</button>
+    <button onclick="exitGame()">الخروج</button>
+  </div>
+
+  <script type="text/javascript" src="https://cdn.emailjs.com/dist/email.min.js"></script>
+  <script type="text/javascript"
+  src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
+</script>
+<script type="text/javascript">
+(function(){
+emailjs.init({
+  publicKey: "YOUR_PUBLIC_KEY",
+});
+})();
+</script>
+  <script>
+    // تهيئة مكتبة EmailJS مع الـ API Key الخاص بك
+    (function() {
+      emailjs.init("hRGlO2W3blSMeV-v2"); // استبدلها بـ API Key الخاص بك من EmailJS
+    })();
+
+    let currentPlayer = 'X';
+    let gameOver = false;
+    let playerName1 = '', playerAge1 = 0;
+    let playerChoice1 = 'X', playerChoice2 = 'O';
+
+    function startGame() {
+      playerName1 = document.getElementById('playerName1').value;
+      playerAge1 = parseInt(document.getElementById('playerAge1').value);
+      playerChoice1 = document.getElementById('playerChoice1').value;
+
+      if (!playerName1 || !playerAge1) {
+        alert("يرجى ملء جميع البيانات!");
+        return;
+      }
+
+      if (playerAge1 < 5 || playerAge1 > 35) {
+        alert("العمر يجب أن يكون بين 5 و 35 سنة فقط!");
+        return;
+      }
+
+      playerChoice2 = playerChoice1 === 'X' ? 'O' : 'X';
+
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('gameArea').style.display = 'block';
+      document.getElementById('status').innerText = `الدور: ${playerChoice1}`;
+      currentPlayer = playerChoice1;
+    }
+
+    function makeMove(cell) {
+      if (cell.innerText === '' && !gameOver) {
+        cell.innerText = currentPlayer;
+        cell.classList.add(currentPlayer.toLowerCase());
+
+        if (checkWinner(currentPlayer)) {
+          let winnerName = currentPlayer === playerChoice1 ? playerName1 : 'الذكاء الاصطناعي';
+          document.getElementById('winnerName').innerText = winnerName;
+          document.getElementById('winMessage').style.display = 'block';
+          gameOver = true;
+          return;
+        }
+
+        if (isDraw()) {
+          document.getElementById('drawMessage').style.display = 'block';
+          gameOver = true;
+          return;
+        }
+
+        currentPlayer = currentPlayer === playerChoice1 ? playerChoice2 : playerChoice1;
+        document.getElementById('status').innerText = `الدور: ${currentPlayer}`;
+
+        if (!gameOver && currentPlayer === playerChoice2) {
+          setTimeout(makeComputerMove, 500);
+        }
+      }
+    }
+
+    function makeComputerMove() {
+      const cells = Array.from(document.querySelectorAll('td'));
+      const board = cells.map(cell => cell.innerText);
+
+      const winPatterns = [
+        [0,1,2], [3,4,5], [6,7,8],
+        [0,3,6], [1,4,7], [2,5,8],
+        [0,4,8], [2,4,6]
+      ];
+
+      // محاولة الفوز أو منع اللاعب من الفوز
+      for (let pattern of winPatterns) {
+        const [a, b, c] = pattern;
+        const line = [board[a], board[b], board[c]];
+        if (line.filter(val => val === playerChoice2).length === 2 && line.includes('')) {
+          const index = pattern[line.indexOf('')];
+          makeMove(cells[index]);
+          return;
+        }
+        if (line.filter(val => val === playerChoice1).length === 2 && line.includes('')) {
+          const index = pattern[line.indexOf('')];
+          makeMove(cells[index]);
+          return;
+        }
+      }
+
+      // إذا لم يجد فرصة للفوز أو منع اللاعب من الفوز، يأخذ المنتصف
+      if (board[4] === '') {
+        makeMove(cells[4]);
+        return;
+      }
+
+      // إجراء تحركات عشوائية
+      const emptyCells = cells.filter(cell => cell.innerText === '');
+      const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+      makeMove(randomCell);
+    }
+
+    function checkWinner(player) {
+      const cells = Array.from(document.querySelectorAll('td'));
+      const board = cells.map(cell => cell.innerText);
+
+      const winPatterns = [
+        [0,1,2], [3,4,5], [6,7,8],
+        [0,3,6], [1,4,7], [2,5,8],
+        [0,4,8], [2,4,6]
+      ];
+
+      return winPatterns.some(pattern => {
+        return pattern.every(index => board[index] === player);
+      });
+    }
+
+    function isDraw() {
+      const cells = Array.from(document.querySelectorAll('td'));
+      return cells.every(cell => cell.innerText !== '');
+    }
+
+    function restartGame() {
+      document.querySelectorAll('td').forEach(cell => {
+        cell.innerText = '';
+        cell.classList.remove('x', 'o');
+      });
+      document.getElementById('winMessage').style.display = 'none';
+      document.getElementById('drawMessage').style.display = 'none';
+      document.getElementById('status').innerText = 'الدور: ' + playerChoice1;
+      gameOver = false;
+    }
+
+    function exitGame() {
+      window.location.reload();
+    }
+
+    function toggleSendButton() {
+      const feedback = document.getElementById('feedbackInput').value;
+      const sendButton = document.getElementById('sendButton');
+      sendButton.style.display = feedback ? 'inline-block' : 'none';
+    }
+
+    function sendFeedback() {
+      const feedback = document.getElementById('feedbackInput').value;
+
+      if (!feedback.trim()) {
+        alert('يرجى كتابة تعليق قبل الإرسال.');
+        return;
+      }
+
+      // الإعدادات لإرسال التعليق عبر البريد
+      const templateParams = {
+        user_email: "apc12345do@gmail.com",  // بريدك الإلكتروني
+        feedback: feedback
+      };
+
+      emailjs.send("service_a8mv54q", "template_vfj5t7s", templateParams)  // استبدل الـ ServiceID و TemplateID
+        .then(function(response) {
+          alert('تم إرسال الاقتراح بنجاح!');
+        }, function(error) {
+          alert('فشل إرسال الاقتراح: ' + JSON.stringify(error));
+        });
+    }
+  </script>
+
+</body>
+</html>
+<input
